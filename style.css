@@ -1,0 +1,49 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Helvetica Neue', sans-serif;
+  background: url('map-background.jpg') center center fixed;
+  background-size: cover;
+}
+
+#map {
+  height: 100vh;
+}
+
+#search-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+}
+
+#search-input {
+  width: calc(100% - 20px);
+  padding: 12px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 3px;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  cursor: pointer;
+  border: none;
+  border-radius: 3px;
+  background-color: #3498db;
+  color: #fff;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
