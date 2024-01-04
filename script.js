@@ -26,9 +26,6 @@ function searchLocation() {
         var coordinates = features[0].geometry.coordinates;
 
         // Clear existing markers
-        // Note: Clearing markers is not a common operation in Mapbox GL JS, 
-        // so you may need to adjust this based on your specific use case.
-        // For simplicity, we'll remove the previous marker by replacing it with a new one.
         if (map.getLayer('marker')) {
           map.removeLayer('marker');
           map.removeSource('marker');
@@ -68,3 +65,72 @@ function searchLocation() {
     })
     .catch(error => console.error('Error:', error));
 }
+
+// Function to fetch and visualize population density data
+function visualizePopulationDensity() {
+  // Fetch the population density data from the proxy server
+  fetch('http://127.0.0.1:8080/proxy')
+    .then(response => response.text())
+    .then(data => {
+      // Parse the ASCII XYZ data
+      var parsedData = parseASCIIXYZ(data);
+
+      // Create a GeoJSON feature collection from the parsed data
+      var geojsonData = {
+        type: 'FeatureCollection',
+        features: parsedData.map(point => ({
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [point.longitude, point.latitude]
+          },
+          properties: {
+            populationDensity: point.populationDensity
+          }
+        }))
+      };
+
+      // Add a heatmap layer to the map
+      map.addSource('heatmap', {
+        type: 'geojson',
+        data: geojsonData
+      });
+
+      map.addLayer({
+        id: 'heatmap-layer',
+        type: 'heatmap',
+        source: 'heatmap',
+        maxzoom: 9,
+        paint: {
+          // Increase the heatmap weight based on population density
+          'heatmap-weight': {
+            property: 'populationDensity',
+            type: 'exponential',
+            stops: [
+              [0, 0],
+              [500, 1]
+            ]
+          },
+          // ... rest of the heatmap properties
+        }
+      });
+    })
+    .catch(error => console.error('Error fetching population density data:', error));
+}
+
+// Function to parse ASCII XYZ data
+function parseASCIIXYZ(data) {
+  var parsedData = [];
+  var lines = data.trim().split('\n');
+  lines.forEach(line => {
+    var values = line.trim().split(/\s+/);
+    var latitude = parseFloat(values[0]);
+    var longitude = parseFloat(values[1]);
+    var populationDensity = parseFloat(values[2]);
+    parsedData.push({ latitude, longitude, populationDensity });
+  });
+  return parsedData;
+}
+
+// Call the function to visualize population density on load
+visualizePopulationDensity();
